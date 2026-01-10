@@ -1,0 +1,104 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./apps/api
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_URL=${REDIS_URL}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - API_SECRET_KEY=${API_SECRET_KEY}
+      - ENV=${ENV}
+      - ENABLE_DOCS=${ENABLE_DOCS}
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASS=${ADMIN_PASS}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL}
+      - WEBAPP_PUBLIC_URL=${WEBAPP_PUBLIC_URL}
+      - API_PUBLIC_URL=${API_PUBLIC_URL}
+      - BOT_SERVICE_URL=${BOT_SERVICE_URL}
+      - AD_PASS_TTL_SECONDS=${AD_PASS_TTL_SECONDS}
+      - RATE_LIMITS_JSON=${RATE_LIMITS_JSON}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  bot:
+    build: ./apps/bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - API_PUBLIC_URL=${API_PUBLIC_URL}
+      - WEBAPP_PUBLIC_URL=${WEBAPP_PUBLIC_URL}
+      - TG_BOT_API_BASE_URL=${TG_BOT_API_BASE_URL}
+      - REDIS_URL=${REDIS_URL}
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  uploader:
+    build: ./apps/uploader
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - STORAGE_CHAT_ID=${STORAGE_CHAT_ID}
+      - TG_BOT_API_BASE_URL=${TG_BOT_API_BASE_URL}
+      - LOCAL_BOT_API_BASE_URL=${LOCAL_BOT_API_BASE_URL}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_URL=${REDIS_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build: ./apps/web
+    volumes:
+      - web_dist:/app/dist
+    command: ["sh", "-c", "npm install && npm run build && tail -f /dev/null"]
+
+  nginx:
+    build: ./infra/nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - web_dist:/usr/share/nginx/html
+    depends_on:
+      - api
+      - web
+
+volumes:
+  web_dist:
