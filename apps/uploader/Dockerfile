@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 WORKDIR /app
-COPY requirements.txt .
+COPY apps/uploader/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY uploader.py ./uploader.py
+COPY apps/uploader/uploader.py ./uploader.py
 CMD ["python", "uploader.py"]
