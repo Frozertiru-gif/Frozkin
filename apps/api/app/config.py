@@ -2,11 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    postgres_host: str = "postgres"
-    postgres_port: int = 5432
-    postgres_db: str = "app"
-    postgres_user: str = "app"
-    postgres_password: str = "app"
+    database_url: str
     redis_url: str = "redis://redis:6379/0"
     bot_token: str = ""
     api_secret_key: str = ""
@@ -19,6 +15,8 @@ class Settings(BaseSettings):
     api_public_url: str = ""
     bot_service_url: str = "http://bot:8085"
     ad_pass_ttl_seconds: int = 600
+    delivery_token_ttl_seconds: int = 600
+    variant_cooldown_seconds: int = 600
     rate_limits_json: str = ""
 
     class Config:

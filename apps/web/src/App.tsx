@@ -5,7 +5,7 @@ import TitlePage from "./pages/TitlePage";
 import EpisodePage from "./pages/EpisodePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import AdGatePage from "./pages/AdGatePage";
-import { authWithTelegram, setToken } from "./api";
+import { authWithTelegram, clearToken, setToken } from "./api";
 
 declare global {
   interface Window {
@@ -21,18 +21,23 @@ declare global {
 export default function App() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [missingTelegram, setMissingTelegram] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       try {
-        window.Telegram?.WebApp?.ready();
         const initData = window.Telegram?.WebApp?.initData || "";
-        if (initData) {
-          const response = await authWithTelegram(initData);
-          setToken(response.access_token);
+        if (!initData) {
+          clearToken();
+          setMissingTelegram(true);
+          return;
         }
+        window.Telegram?.WebApp?.ready();
+        const response = await authWithTelegram(initData);
+        setToken(response.access_token);
         setReady(true);
       } catch (err) {
+        clearToken();
         setError("Не удалось авторизоваться");
       }
     };
@@ -41,6 +46,9 @@ export default function App() {
 
   if (error) {
     return <div className="error">{error}</div>;
+  }
+  if (missingTelegram) {
+    return <div className="error">Open in Telegram</div>;
   }
   if (!ready) {
     return <div className="loading">Загрузка...</div>;
