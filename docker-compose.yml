@@ -25,7 +25,9 @@ services:
       retries: 5
 
   api:
-    build: ./apps/api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -54,7 +56,9 @@ services:
       - "8000:8000"
 
   bot:
-    build: ./apps/bot
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
       - API_PUBLIC_URL=${API_PUBLIC_URL}
@@ -66,7 +70,9 @@ services:
         condition: service_healthy
 
   uploader:
-    build: ./apps/uploader
+    build:
+      context: .
+      dockerfile: apps/uploader/Dockerfile
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
       - STORAGE_CHAT_ID=${STORAGE_CHAT_ID}
@@ -85,13 +91,17 @@ services:
         condition: service_healthy
 
   web:
-    build: ./apps/web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
     volumes:
       - web_dist:/app/dist
     command: ["sh", "-c", "npm install && npm run build && tail -f /dev/null"]
 
   nginx:
-    build: ./infra/nginx
+    build:
+      context: .
+      dockerfile: infra/nginx/Dockerfile
     ports:
       - "8080:80"
     volumes:
