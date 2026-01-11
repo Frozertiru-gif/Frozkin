@@ -45,7 +45,7 @@ export default function EpisodePage() {
         }),
       });
       if (response.action === "deliver") {
-        await apiFetch(`/watch/deliver?variant_id=${variant.id}`, { method: "POST" });
+        await apiFetch(`/watch/deliver?delivery_token=${response.delivery_token}`, { method: "POST" });
         setError("Видео отправлено в чат");
       } else {
         localStorage.setItem("pending_variant", JSON.stringify({ scope_id: id, variant }));

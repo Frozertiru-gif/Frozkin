@@ -56,7 +56,7 @@ class WatchRequestIn(BaseModel):
 
 class WatchResponse(BaseModel):
     action: str
-    variant_id: Optional[int] = None
+    delivery_token: Optional[str] = None
     url: Optional[str] = None
 
 

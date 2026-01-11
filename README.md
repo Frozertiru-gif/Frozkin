@@ -20,6 +20,7 @@ cp .env.example .env
 - `STORAGE_CHAT_ID`
 - `API_SECRET_KEY`
 - `ADMIN_PASS`
+- `DATABASE_URL`
 
 Запуск:
 
@@ -86,6 +87,9 @@ ngrok http 8080
 
 ### Обход рекламы
 Убедитесь, что `ad_pass` nonce одноразовый и имеет TTL. Логика в `apps/api/app/routers/ads.py` и `apps/api/app/routers/watch.py`.
+
+### TTL по умолчанию
+- `DELIVERY_TOKEN_TTL_SECONDS` и `VARIANT_COOLDOWN_SECONDS` по умолчанию 600 секунд (если не переопределены в env). 
 
 ## Команды
 

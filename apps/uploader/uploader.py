@@ -14,15 +14,7 @@ TG_BOT_API_BASE_URL = os.getenv("TG_BOT_API_BASE_URL") or "https://api.telegram.
 LOCAL_BOT_API_BASE_URL = os.getenv("LOCAL_BOT_API_BASE_URL")
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "postgres")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "app")
-POSTGRES_USER = os.getenv("POSTGRES_USER", "app")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "app")
-
-DATABASE_URL = (
-    f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-)
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 Base = declarative_base()
 
