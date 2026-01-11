@@ -90,25 +90,11 @@ services:
       redis:
         condition: service_healthy
 
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    volumes:
-      - web_dist:/app/dist
-    command: ["sh", "-c", "npm install && npm run build && tail -f /dev/null"]
-
   nginx:
     build:
       context: .
       dockerfile: infra/nginx/Dockerfile
     ports:
       - "8080:80"
-    volumes:
-      - web_dist:/usr/share/nginx/html
     depends_on:
       - api
-      - web
-
-volumes:
-  web_dist:
